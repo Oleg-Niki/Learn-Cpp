@@ -34,9 +34,9 @@ git clone https://github.com/yourusername/elevator-simulation.git
 cd elevator-simulation
 ```
 # 2. Examine the source:
-#    - elevator_simulation.cpp  → C++ simulation code
-#    - index.html              → simple page to load Wasm
-#    - README.md               → this guide
+   - elevator_simulation.cpp  → C++ simulation code
+    - index.html              → simple page to load Wasm
+    - README.md               → this guide
 
 ⚙️ 3. Build the WebAssembly Module
 Activate Emscripten
@@ -58,7 +58,7 @@ elevator_sim.js
 
 A glue loader for the browser.
 
-🌐 4. Frontend Integration
+# 🌐 4. Frontend Integration
 Open index.html (provided) or create your own:
 
 ```
