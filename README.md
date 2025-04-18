@@ -1,7 +1,7 @@
 # Learn-Cpp
 CIS 278 Class
 
-# Elevator Simulation: Step‑by‑Step Guide
+## Elevator Simulation: Step‑by‑Step Guide
 
 This document explains how to set up, build, and run our C++ elevator simulation in the browser using WebAssembly (Wasm). Follow these steps to get a working demo on your local machine or deploy it to AWS S3 for static‑site hosting.
 
@@ -30,8 +30,8 @@ Before you begin, make sure you have:
 
 1. Clone our elevator-simulation repository
 ```
-git clone https://github.com/yourusername/elevator-simulation.git
-cd elevator-simulation
+git clone https://github.com/Oleg-Niki/Learn-Cpp.git
+cd Learn-Cpp
 ```
 2. Examine the source:
    - elevator_simulation.cpp  → C++ simulation code
