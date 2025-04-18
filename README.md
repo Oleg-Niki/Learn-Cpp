@@ -28,12 +28,12 @@ Before you begin, make sure you have:
 
 ## 🛠 2. Clone & Inspect the Project
 
-# 1. Clone our elevator-simulation repository
+1. Clone our elevator-simulation repository
 ```
 git clone https://github.com/yourusername/elevator-simulation.git
 cd elevator-simulation
 ```
-# 2. Examine the source:
+2. Examine the source:
    - elevator_simulation.cpp  → C++ simulation code
     - index.html              → simple page to load Wasm
     - README.md               → this guide
