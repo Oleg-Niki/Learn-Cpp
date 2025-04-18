@@ -14,8 +14,8 @@ Before you begin, make sure you have:
 1. **Git** (to clone the repo)  
 2. **Emscripten SDK** (for compiling C++ to Wasm)
 
-   ```
-    # install emsdk
+   ```bash
+   # install emsdk
    git clone https://github.com/emscripten-core/emsdk.git
    cd emsdk
    ./emsdk install latest
@@ -39,7 +39,7 @@ cd Learn-Cpp
 ```
 
 2. Examine the source:
-   - elevator_simulation.cpp  → C++ simulation code
+    - CIS278_Lab.cpp         → C++ simulation code
     - index.html              → simple page to load Wasm
     - README.md               → this guide
 
@@ -100,12 +100,15 @@ Open index.html (provided) or create your own:
   </script>
 </body>
 </html>
+
+```
+
 _addRequest(floor): send a new floor request
 
 _stepSimulation(): advance one simulation step
 
 _getStatus(): returns a string with each elevator’s floor/direction
-```
+
 
 ## 🚀 5. Local Testing
 Start a simple HTTP server (to avoid Wasm CORS issues):
