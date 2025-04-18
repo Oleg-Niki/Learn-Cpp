@@ -114,12 +114,13 @@ Enter floor numbers and watch the status update every 500 ms.
 Build the Wasm & HTML as above.
 
 Upload these files to your S3 bucket’s public/ folder:
-
+```
 index.html
 
 elevator_sim.js
 
 elevator_sim.wasm
+```
 
 Enable static‑site hosting in the S3 bucket settings.
 
