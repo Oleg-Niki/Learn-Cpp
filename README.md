@@ -119,6 +119,7 @@ Enter floor numbers and watch the status update every 500 ms.
 ```
 
 ## ☁️ 6. Deploy to AWS S3 (Optional)
+
 Build the Wasm & HTML as above.
 
 Upload these files to your S3 bucket’s public/ folder:
@@ -138,6 +139,7 @@ Set the bucket policy & CORS to allow public reads.
 Browse to your S3 URL (e.g. https://my-bucket.s3.amazonaws.com/index.html).
 
 ## 🔍 7. How It Works
+
 C++ Core
 
 Simulates multiple elevators, each with current floor, target floor, direction, and door state.
@@ -163,6 +165,7 @@ Ticks the simulation (_stepSimulation)
 Renders status (_getStatus)
 
 ## ✅ 8. Assignment Checklist
+
  Install & activate Emscripten SDK
 
  Clone & compile the C++ code to Wasm
