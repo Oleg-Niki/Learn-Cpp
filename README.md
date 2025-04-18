@@ -38,7 +38,7 @@ cd elevator-simulation
     - index.html              → simple page to load Wasm
     - README.md               → this guide
 
-⚙️ 3. Build the WebAssembly Module
+## ⚙️ 3. Build the WebAssembly Module
 Activate Emscripten
 
 source /path/to/emsdk/emsdk_env.sh
@@ -58,7 +58,7 @@ elevator_sim.js
 
 A glue loader for the browser.
 
-# 🌐 4. Frontend Integration
+## 🌐 4. Frontend Integration
 Open index.html (provided) or create your own:
 
 ```
@@ -99,7 +99,7 @@ _stepSimulation(): advance one simulation step
 
 _getStatus(): returns a string with each elevator’s floor/direction
 ```
-🚀 5. Local Testing
+## 🚀 5. Local Testing
 Start a simple HTTP server (to avoid Wasm CORS issues):
 
 ```
@@ -110,7 +110,7 @@ Open your browser at http://localhost:8000.
 Enter floor numbers and watch the status update every 500 ms.
 ```
 
-☁️ 6. Deploy to AWS S3 (Optional)
+## ☁️ 6. Deploy to AWS S3 (Optional)
 Build the Wasm & HTML as above.
 
 Upload these files to your S3 bucket’s public/ folder:
@@ -128,7 +128,7 @@ Set the bucket policy & CORS to allow public reads.
 
 Browse to your S3 URL (e.g. https://my-bucket.s3.amazonaws.com/index.html).
 
-🔍 7. How It Works
+## 🔍 7. How It Works
 C++ Core
 
 Simulates multiple elevators, each with current floor, target floor, direction, and door state.
@@ -153,7 +153,7 @@ Ticks the simulation (_stepSimulation)
 
 Renders status (_getStatus)
 
-✅ 8. Assignment Checklist
+## ✅ 8. Assignment Checklist
  Install & activate Emscripten SDK
 
  Clone & compile the C++ code to Wasm
