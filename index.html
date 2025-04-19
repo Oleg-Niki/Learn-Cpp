@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Character encoding -->
+    <meta charset="utf-8">
+    <!-- Responsive viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Page title -->
+    <title>Elevator Simulation</title>
+    <!-- Optional: Basic styling to center and style elements -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        #status {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 4px;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            white-space: pre-wrap;
+            /* preserve line breaks */
+            font-family: monospace;
+        }
+        
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main heading -->
+    <h1>Elevator Simulation Demo</h1>
+
+    <!-- Container for status output -->
+    <div id="status">Loading simulation...</div>
+
+    <!-- User controls: enter floor number and call elevator -->
+    <div id="controls">
+        <label for="floor">Floor # (1–10):</label>
+        <input id="floor" type="number" min="1" max="10" value="1" />
+        <button id="call" disabled>Call Elevator</button>
+    </div>
+
+    <!-- Include the Emscripten-generated loader script -->
+    <script src="elevator_sim.js"></script>
+    <script>
+        /**
+         * Once the Wasm module is instantiated, Emscripten will call
+         * Module.onRuntimeInitialized. This is where we wire up our
+         * UI controls to the exported C++ functions.
+         */
+        Module.onRuntimeInitialized = () => {
+            // Get references to DOM elements
+            const statusEl = document.getElementById('status');
+            const floorInput = document.getElementById('floor');
+            const callButton = document.getElementById('call');
+
+            // Enable the button now that the module is ready
+            callButton.disabled = false;
+            statusEl.textContent = 'Simulation ready.';
+
+            /**
+             * Helper: Fetch and render the current elevator status.
+             * Calls the C++ exported function _getStatus(), which returns
+             * a pointer to a null‑terminated UTF‑8 string in Wasm memory.
+             */
+            function refreshStatus() {
+                // Call the C++ function and convert pointer to JS string
+                const ptr = Module._getStatus();
+                const statusText = Module.UTF8ToString(ptr);
+                statusEl.textContent = statusText;
+            }
+
+            // Set up the click handler for the "Call Elevator" button
+            callButton.addEventListener('click', () => {
+                // Read the desired floor from the input
+                const floorNumber = parseInt(floorInput.value, 10);
+
+                // Validate input
+                if (isNaN(floorNumber) || floorNumber < 1 || floorNumber > 10) {
+                    alert('Please enter a valid floor between 1 and 10.');
+                    return;
+                }
+
+                // Call the C++ function to add a request
+                // Note: Emscripten exports functions with an underscore prefix.
+                Module._addRequest(floorNumber);
+
+                // Immediately refresh status so the user sees their request
+                refreshStatus();
+            });
+
+            // Start a periodic loop to advance the simulation and update the UI
+            setInterval(() => {
+                // Advance the simulation one step
+                Module._stepSimulation();
+
+                // Update the status display
+                refreshStatus();
+            }, 500); // 500 ms per simulation step
+        };
+    </script>
+</body>
+
+</html>

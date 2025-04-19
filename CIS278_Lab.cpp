@@ -6,6 +6,7 @@
 #include <chrono>
 #include <string>
 #include <stdexcept>          // <-- for the exception below
+#include <sstream>   // for ostringstream
 
 // Enumeration for elevator direction
 enum class Direction { IDLE, UP, DOWN };
@@ -146,7 +147,23 @@ public:
         }
         std::cout << "-----------------------------\n";
     }
+    std::string serializeStatus() const {
+        std::ostringstream out;
+        out << "Current Elevator Status:\n";
+        for (auto const &e : elevators) {
+            out << "  Elevator " << e.id
+                << ": Floor " << e.currentFloor;
+            if      (e.doorOpen)              out << " (Doors Open)";
+            else if (e.direction == Direction::UP)   out << " (Moving Up)";
+            else if (e.direction == Direction::DOWN) out << " (Moving Down)";
+            else                                 out << " (Idle)";
+            out << "\n";
+        }
+        out << "-----------------------------\n";
+        return out.str();
+    }
 };
+
 
 int main() {
     const int totalFloors  = 10;
@@ -191,4 +208,47 @@ int main() {
 
     std::cout << "Elevator Simulation Ended.\n";
     return 0;
+}
+// At top of file, after includes:
+#include <sstream>   // for stringify
+
+// … your Elevator and Building classes …
+
+// Create one global Building (adjust floors/elevators as needed)
+static Building gBuilding(10 /*floors*/, 2 /*elevators*/);
+
+// Helper to turn the Building’s status into a single string
+std::string getStatusString() {
+    std::ostringstream out;
+    for (int i = 1; i <= /*e.g.*/10; ++i) {
+        // nop: example if you want floor-by-floor — skip this
+    }
+    // Or just call your existing displayStatus but capture its output:
+    // You could modify Building to offer a method returning a string instead of printing.
+    // For brevity, let’s assume you add:
+    // std::string Building::serializeStatus() const { /* same as displayStatus but to string */ }
+    out << gBuilding.serializeStatus();
+    return out.str();
+}
+
+// Expose C‐ABI functions visible to the linker
+extern "C" {
+
+    // Called from JS to submit a floor request
+    void addRequest(int floor) {
+        gBuilding.requestElevator(floor);
+    }
+
+    // Advance the entire simulation by one step
+    void stepSimulation() {
+        gBuilding.step();
+    }
+
+    // Returns a pointer to a null‑terminated C string in Wasm memory
+    const char* getStatus() {
+        // we must keep the buffer alive; static here will persist
+        static std::string status;
+        status = getStatusString();
+        return status.c_str();
+    }
 }
