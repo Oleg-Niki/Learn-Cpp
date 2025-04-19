@@ -47,14 +47,11 @@ cd Learn-Cpp
 Activate Emscripten
 
 source /path/to/emsdk/emsdk_env.sh
-Compile
+Compile in cmd (copy paste below:)
 
 ```
-emcc elevator_simulation.cpp \
-  -O3 \
-  -s WASM=1 \
-  -s EXPORTED_FUNCTIONS="['_addRequest','_stepSimulation','_getStatus']" \
-  -o elevator_sim.js
+emcc CIS278_Lab.cpp -O3 -s WASM=1 -s "EXPORTED_FUNCTIONS=['_addRequest','_stepSimulation','_getStatus']" -s "EXPORTED_RUNTIME_METHODS=['UTF8ToString']" -o elevator_sim.js
+
 ```
 
 This produces:
