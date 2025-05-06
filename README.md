@@ -4,6 +4,8 @@
 - **Jake Sakamoto** — Architect & C++ lead  
 - **Oleg Nikitashin** — WebAssembly & GUI integration  
 
+The elevator project has numerous capabilities such as prioritizing user requests based on the floor they are on, easy to understand and visual GUI developed and hosted on AWS, and configurable elevator numbers and floors. The project utilizes two classes; the elevator class and building class. The elevator class allows for the capability to support multiple elevators if need be. User requests are stored in vectors, which are then sorted and utilized to calculate the optimized floor the elevator needs to head to. The building class uses the number of floors and elevators to create the building (with a default of 10 floors and 2 elevators). Configuring the number of elevators, as well as the number of floors is as easy as going to the Web Assembly Wrappers portion and changing the parameters in the global class on line 238 to the number of floors, followed by number of elevators: "static Building globalBuilding(10, 2)". To setup and run the actual project itself, you'll need to setup and be able to run AWS (instructions that we used are linked below). After hosting successfully, you will be able to open an external tab that shows you the basic interface that allows you to input the desired floor, with the elevator visually going to the respective floor. If there are more than one requests, than any idle elevator will fill in to take the request -- otherwise the nearest operating elevator will take a request.
+
 CIS 278 Class
 Due Monday by 11:59pm Points 100 Submitting a file upload Available until May 5 at 11:59pm
 
