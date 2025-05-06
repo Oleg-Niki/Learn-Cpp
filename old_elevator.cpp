@@ -1,8 +1,13 @@
+//Oleg Nikitashin and Jake Sakamoto
+//Date: 05/05/2025
+//Elevator Project
+
 #include <iostream>
 #include <vector> //hold user requests
-#include <thread>
+#include <thread> //thread and chrono are for delay
 #include <chrono> //thread and chrono are for delay
 #include <algorithm> //for vector sorting (for prioritzing user requests)
+#include <sstream>
 using namespace std;
 
 class Elevator{
@@ -13,15 +18,15 @@ public:
     bool goingUp;
     bool idle;
 
-    vector<int> upRequests;   //simulate button requests for individuals wanting to go up
+    vector<int> upRequests; //simulate button requests for individuals wanting to go up
     vector<int> downRequests; //simulate button requests for individuals wanting to go down
 
     Elevator(int elevatorId){
-        id = elevatorId;
-        currentFloor = 1;
-        doorOpen = false;
-        goingUp = true;
-        idle = true; //if no user requests elevator
+      id = elevatorId;
+      currentFloor = 1; //default 1st floor
+      doorOpen = false;
+      goingUp = true;
+      idle = true; //if no user requests elevator
     }
 
     void addRequest(int floor, bool goingUp){ //add user request to vector
@@ -91,7 +96,6 @@ public:
         }
 
         if(currentFloor == targetFloor){ //destination reached
-            openDoors();
             if(goingUp){
                 upRequests.erase(upRequests.begin()); //most recent request for up(first in line) gets removed from vector
             } 
@@ -107,22 +111,7 @@ public:
         }
     }
 
-    void openDoors(){
-        doorOpen = true;
-        cout << "\nElevator " << id << ": Doors opening at floor " << currentFloor << endl;
-        this_thread::sleep_for(chrono::seconds(3)); //delay for realism
-        closeDoors();
-    }
-
-    void closeDoors(){
-        if(doorOpen){
-            doorOpen = false;
-            cout << "Elevator " << id << ": Doors closing." << endl;
-            this_thread::sleep_for(chrono::seconds(1));
-        }
-    }
-
-    void showStatus(){ //Provides visual indication for users to understand the current elevator state
+    void showStatus()const{ //Provides visual indication for users to understand the current elevator state
         cout << "Elevator " << id << ": Floor " << currentFloor << " | ";
         if(idle){
             cout << "Idle";
@@ -148,23 +137,14 @@ class Building{
 public:
     vector<Elevator> elevators;
     int numFloors;
-    int numElev;
 
-    Building(int totFloors, int totElev){
+    Building(int totFloors, int numElev){
         numFloors = totFloors;
-        numElev = totElev;
 
         for(int i = 0; i < numElev; i++){
-            elevators.push_back(Elevator(i + 1));
+            elevators.push_back(Elevator(i + 1)); //Want to start with Elevator 1 instead of Elevator 0
         }
     };
-
-    void showStatus(){ //status of elevator is shown
-        cout << "\n.............. Building Status ..............\n";
-        for(int i = 0; i < elevators.size(); i++){
-            elevators[i].showStatus();
-        }
-    }
 
     void moveElevators(){  //checks state of elevator - to see if any of the elevators are moving (to be able to update status)
         bool elevIsMoving = false; 
@@ -180,46 +160,96 @@ public:
         }
     }
 
-    void getInput(){ //handles user input
-        cout << "\nEnter Floor Number, Direction (1 = Up, 0 = Down), and Elevator # (ex. 5 1 1) or -1 to Continue: ";
-        int floor, direction, elevatorId;
-        cin >> floor;
-        
-        if(floor == -1){
-            return;
+    void heading(int floor){ //logic to determine the closest available elevator (depending on how many elevators are configured)
+        int freeElevator = -1; //default -1 if elevator not found, will hold the index of the closest elevator
+        int bestDist = numFloors + 1; //used to calculate shortest dist
+
+        for(int i = 0; i < elevators.size(); i++){ 
+            if(elevators[i].idle){ //checking if idle
+                int currDistance = abs(elevators[i].currentFloor - floor); //calculating shortest dist
+                if(currDistance < bestDist){ //if a elevator has a closer dist than the current set one, then update the bestDist and freeElevator vairable
+                    bestDist = currDistance;
+                    freeElevator  = i;
+                }
+            }
         }
 
-        cin >> direction;
-        cin >> elevatorId;
-        try{
-            if(floor >= 1 && floor <= numFloors && elevatorId >= 1 && elevatorId <= numElev && (direction == 0 || direction == 1)){ //checking for valid input
-                elevators[elevatorId - 1].addRequest(floor, direction == 1);
-            } 
+        if(freeElevator < 0){ //if all elevators are operatnig, will default to closest operating elevator -- the reason why you want to do this is because if there is an elevator that is not operating, we want to put that to use before requesting one that's already moving
+            for(int i = 0; i < elevators.size(); i++){
+                int currDistance = abs(elevators[i].currentFloor - floor);
+                if(currDistance < bestDist){
+                    bestDist = currDistance;
+                    freeElevator  = i;
+                }
+            }
         }
-        catch(...){
-            cout << "Invalid input! Floors: 1-" << numFloors << ", Direction: 0 or 1, Elevators: 1-" << numElev << endl;
-        }
+        elevators[freeElevator].addRequest(floor, floor > elevators[freeElevator].currentFloor); //the second paramter will yield a true/false depending on if the elevator is head up or down
+        cout << "Elevator " << (freeElevator + 1) << " is now headed to floor " << floor << "\n";
+    }
+
+    string showStatus() const{ //shows status of elevator via output string stream
+        ostringstream out;
+        out << "\n.............. Building Status ..............\n";
         
+        for (int i = 0; i < elevators.size(); ++i) {
+            out << "Elevator " << elevators[i].id << ": Floor " << elevators[i].currentFloor << " | ";
+            if (elevators[i].idle){
+                out << "Idle";
+            } 
+            else if (elevators[i].goingUp){
+                out << "Going Up";
+            }
+            else{
+                out << "Going Down";
+            }
+            
+            out << " | Doors ";
+            if (elevators[i].doorOpen){
+                out << "Open\n";
+            }
+            else {
+                out << "Closed\n";
+            }
+        }
+        return out.str(); //takes the data and puts it into a single string -- need this for the javascript for GUI
     }
 };
 
-int main(){
-    int floors;
-    int elevCnt;
+int main() {
+    //this whole part is to validate that the code runs successfully on vscode without any errors
+    // int floors = 10;
+    // int elevCnt = 1;
+    // Building veryAwesomeBuilding(floors, elevCnt);
 
-    //setup for elevator/building
-    cout << "ENTER THE NUMBER OF FLOORS IN THE BUILDING:" << endl;
-    cin >> floors;
-    cout << "ENTER THE NUMBER OF ELEVATORS IN THE BUILDING:" << endl;
-    cin >> elevCnt;
-    cout << "...................................................\n" << endl;
-    Building veryAwesomeBuilding(floors, elevCnt);
-    
-    while(true){
-        veryAwesomeBuilding.moveElevators();
-        veryAwesomeBuilding.getInput();
-        this_thread::sleep_for(chrono::seconds(1));
+    // while(true){
+    //     veryAwesomeBuilding.moveElevators();
+    //     cout << "Enter floor to call (or -1 to skip): ";
+    //     int floor; 
+    //     cin >> floor;
+    //     if(floor >= 1 && floor <= floors){
+    //         veryAwesomeBuilding.heading(floor);
+    //     }
+    //     this_thread::sleep_for(chrono::seconds(1));
+    // }
+    // return 0;
+}
+
+//the part below focuses on WebAssembly Wrappers for C linkage
+static Building globalBuilding(10, 2); //global building to make sure javascript knows the class exists while running
+
+extern "C"{ //this is to make sure names stay consistent
+
+    void addRequest(int floor){ //javascript's call for an elevator, we will then use the method we created
+        globalBuilding.heading(floor);
     }
 
-    return 0;
+    void stepSimulation(){ //takes javascript's call and uses our cpp method to make elevator move
+        globalBuilding.moveElevators();
+    }
+
+    const char* getStatus(){ //allows javascript to access the current elevator state, i.e. the output string
+        static string elevStatus;
+        elevStatus = globalBuilding.showStatus();
+        return elevStatus.c_str(); //converting to a format javascript can understand
+    }
 }
