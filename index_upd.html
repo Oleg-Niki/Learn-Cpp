@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Elevator Simulation GUI</title>
+    <style>
+        /* Container for the entire building grid */
+        
+        #building {
+            display: grid;
+            /* These CSS variables can be updated to match your simulation */
+            --floors: 10;
+            --elevators: 2;
+            grid-template-rows: repeat(var(--floors), 40px);
+            grid-template-columns: repeat(var(--elevators), 60px);
+            gap: 4px;
+            background-color: #e0e0e0;
+            padding: 8px;
+            border: 2px solid #333;
+            /* Flip so row 1 is at bottom */
+            transform: rotateX(180deg);
+            transform-style: preserve-3d;
+            margin: 1rem auto;
+            width: calc(var(--elevators) * 60px + var(--elevators) * 4px + 16px);
+        }
+        /* Each cell representing an elevator shaft floor */
+        
+        .cell {
+            position: relative;
+            background: #fafafa;
+            border: 1px solid #bbb;
+        }
+        /* Elevator car element */
+        
+        .elevator-car {
+            position: absolute;
+            bottom: 0;
+            /* since container is flipped, bottom is the actual floor */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #007bff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        /* UI Controls */
+        
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem auto;
+        }
+        
+        #status {
+            text-align: center;
+            font-family: monospace;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+        }
+        
+        button {
+            padding: 0.5rem 1rem;
+            background: #28a745;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        
+        input[type="number"] {
+            width: 3rem;
+            padding: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align:center;">Elevator Simulation</h1>
+
+    <!-- Controls for calling the elevator -->
+    <div id="controls">
+        <label for="floor">Floor # (1–10):</label>
+        <input id="floor" type="number" min="1" max="10" value="1" />
+        <button id="call" disabled>Call Elevator</button>
+    </div>
+
+    <!-- Graphical building grid -->
+    <div id="building"></div>
+
+    <!-- Status text logs -->
+    <div id="status">Loading simulation...</div>
+
+    <!-- Emscripten loader script -->
+    <script src="elevator_sim.js"></script>
+    <script>
+        // Configuration (should match your C++ initialization)
+        const FLOOR_COUNT = 10;
+        const ELEV_COUNT = 2;
+
+        Module.onRuntimeInitialized = () => {
+            const buildingEl = document.getElementById('building');
+            const statusEl = document.getElementById('status');
+            const floorIn = document.getElementById('floor');
+            const callBtn = document.getElementById('call');
+
+            // Build the grid cells
+            buildingEl.style.setProperty('--floors', FLOOR_COUNT);
+            buildingEl.style.setProperty('--elevators', ELEV_COUNT);
+            for (let f = 1; f <= FLOOR_COUNT; f++) {
+                for (let e = 1; e <= ELEV_COUNT; e++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${e}-${f}`;
+                    buildingEl.appendChild(cell);
+                }
+            }
+
+            // Enable button after Wasm is ready
+            callBtn.disabled = false;
+            statusEl.textContent = 'Simulation ready.';
+
+            // Refresh status text & elevator positions
+            function refresh() {
+                // Get text status
+                const ptr = Module._getStatus();
+                const txt = Module.UTF8ToString(ptr);
+                statusEl.textContent = txt;
+
+                // Clear any existing cars
+                document.querySelectorAll('.elevator-car').forEach(el => el.remove());
+
+                // Parse lines like: "Elevator 1: Floor 5 | Going Up | Doors Closed"
+                txt.split("\n").forEach(line => {
+                    const m = line.match(/Elevator (\d+): Floor (\d+)/);
+                    if (m) {
+                        const [_, id, floor] = m;
+                        const cell = document.getElementById(`cell-${id}-${floor}`);
+                        if (cell) {
+                            const car = document.createElement('div');
+                            car.className = 'elevator-car';
+                            car.textContent = id;
+                            cell.appendChild(car);
+                        }
+                    }
+                });
+            }
+
+            // Handle call button
+            callBtn.addEventListener('click', () => {
+                const f = parseInt(floorIn.value, 10);
+                if (isNaN(f) || f < 1 || f > FLOOR_COUNT) {
+                    alert('Enter a valid floor between 1 and ' + FLOOR_COUNT);
+                    return;
+                }
+                Module._addRequest(f);
+                refresh();
+            });
+
+            // Main simulation loop: step + refresh every 500ms
+            setInterval(() => {
+                Module._stepSimulation();
+                refresh();
+            }, 500);
+        };
+    </script>
+</body>
+
+</html>
