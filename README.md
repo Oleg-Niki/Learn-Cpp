@@ -173,7 +173,3 @@ Renders status (_getStatus)
  Verify elevator_sim.wasm & elevator_sim.js are generated
 
  Run index.html locally and confirm simulation works
-
- (Optional) Deploy to AWS S3 and share your public URL
-
- Submit your S3 link and a brief demo video/description
