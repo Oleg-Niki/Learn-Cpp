@@ -1,4 +1,9 @@
 # Learn-Cpp Short Project 1
+## Authors
+
+- **Jake Sakamoto** — Architect & C++ lead  
+- **Oleg Nikitashin** — WebAssembly & GUI integration  
+
 CIS 278 Class
 Due Monday by 11:59pm Points 100 Submitting a file upload Available until May 5 at 11:59pm
 
