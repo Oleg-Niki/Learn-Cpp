@@ -72,7 +72,7 @@ elevator_sim.js
 A glue loader for the browser.
 
 ## 🌐 4. Frontend Integration
-Open index.html (provided) or create your own:
+Open index.html (provided) download one from this rep to create your own:
 
 ```
 <!DOCTYPE html>
