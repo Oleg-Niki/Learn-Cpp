@@ -1,5 +1,14 @@
-# Learn-Cpp
+# Learn-Cpp Short Project 1
 CIS 278 Class
+Due Monday by 11:59pm Points 100 Submitting a file upload Available until May 5 at 11:59pm
+
+Project Title: Elevator Simulation in C++
+
+Course: Intermediate C++ Programming University Inspiration: University of Waterloo Project Type: Team Project (up to 3 students)
+
+Project Overview:
+
+In this project, your team will design and implement a simulation of an elevator system using C++. The simulation should model the behavior of a multi-floor building with one or more elevators, handling user requests, managing elevator movement, and simulating real-time actions. The main goal is to practice object-oriented programming (OOP), system design, and interactive console input/output.
 
 ## Elevator Simulation: Step‑by‑Step Guide
 
